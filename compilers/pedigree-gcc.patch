@@ -23,26 +23,26 @@ diff --git a/config.sub b/config.sub
 index 41146e11c6c..5de531dfb37 100755
 --- a/config.sub
 +++ b/config.sub
-@@ -1531,6 +1531,9 @@ case $os in
+@@ -1507,6 +1507,9 @@ case $os in
  		;;
- 	-nacl*)
+ 	ios)
  		;;
-+	-pedigree*)
-+		os=-pedigree
-+		;;
- 	-none)
++        pedigree*)
++                os=-pedigree
++                ;;
+ 	none)
  		;;
- 	*)
+ 	*-eabi)
 diff --git a/configure.ac b/configure.ac
 index 74bf58aad93..2af081be2cc 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1817,7 +1817,7 @@ ACX_ELF_TARGET_IFELSE([# ELF platforms build the lto-plugin always.
+@@ -1723,7 +1723,7 @@ ACX_ELF_TARGET_IFELSE([# ELF platforms b
    build_lto_plugin=yes
  ],[if test x"$default_enable_lto" = x"yes" ; then
      case $target in
--      *-apple-darwin9* | *-cygwin* | *-mingw* | *djgpp*) ;;
-+      *-apple-darwin9* | *-cygwin* | *-mingw* | *djgpp* | *pedigree*) ;;
+-      *-apple-darwin[[912]]* | *-cygwin* | *-mingw* | *djgpp*) ;;
++      *-apple-darwin[[912]]* | *-cygwin* | *-mingw* | *djgpp* | *pedigree*) ;;
        # On other non-ELF platforms, LTO has yet to be validated.
        *) enable_lto=no ;;
      esac
@@ -85,12 +85,12 @@ index 1d5b23f228d..fe4e2fa951a 100644
  *-*-elf|arc*-*-elf*)
    # Assume that newlib is being used and so __cxa_atexit is provided.
    default_use_cxa_atexit=yes
-@@ -1108,7 +1115,7 @@ arm*-*-phoenix*)
- 	tm_file="${tm_file} arm/aout.h arm/arm.h"
+@@ -1215,7 +1215,7 @@ arm*-*-phoenix*)
  	tmake_file="${tmake_file} arm/t-arm arm/t-bpabi arm/t-phoenix"
+ 	target_cpu_cname="arm7tdmi"
  	;;
--arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems*)
-+arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems* | arm*-*-pedigree*)
+-arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems* | arm*-*-fuchsia*)
++arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems* | arm*-*-fuchsia* | arm*-*-pedigree*)
  	case ${target} in
  	arm*eb-*-eabi*)
  	  tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
@@ -130,9 +130,7 @@ new file mode 100644
 index 00000000000..2db4e8c9f1b
 --- /dev/null
 +++ b/gcc/config/pedigree.h
-@@ -0,0 +1,44 @@
-+#define NO_IMPLICIT_EXTERN_C
-+
+@@ -0,0 +1,42 @@
 +#undef STARTFILE_SPEC
 +#define STARTFILE_SPEC \
 +    "%{!shared:%{pie:S}crt1.o%s} crti.o%s %{shared|pie:crtbeginS.o%s;:crtbegin.o%s}"
@@ -273,21 +271,3 @@ index ece12567794..8d1512a4369 100644
    *-qnx6.1* | *-qnx6.2*)
      SECTION_FLAGS='-ffunction-sections -fdata-sections'
      AC_SUBST(SECTION_FLAGS) 
-diff --git a/libtool.m4 b/libtool.m4
-index 24d13f34409..c35bfa03ceb 100644
---- a/libtool.m4
-+++ b/libtool.m4
-@@ -5377,7 +5377,9 @@ if test -n "$compiler"; then
-   _LT_LINKER_SHLIBS($1)
-   _LT_SYS_DYNAMIC_LINKER($1)
-   _LT_LINKER_HARDCODE_LIBPATH($1)
--  LT_SYS_DLOPEN_SELF
-+  if test "$cross_compiling" = no; then
-+    LT_SYS_DLOPEN_SELF
-+  fi
-   _LT_CMD_STRIPLIB
- 
-   # Report which library types will actually be built
--- 
-2.12.0.rc1.440.g5b76565f74-goog
-
