@@ -35,7 +35,12 @@ old=$(pwd)
 # Fix up POSIX headers which sometimes get a recursive symlink.
 rm -f src/subsys/posix/include/include || true
 
+
+git submodule update --init --recursive
+
+
 set +e
+
 
 # Update the local working copy only if it is clean.
 changed=`git status -s -uno`
@@ -53,14 +58,8 @@ fi
 
 set -e
 
-echo
-echo "Configuring the Pedigree UPdater..."
 
-$script_dir/setup_pup.py amd64
-$script_dir/run_pup.py sync
 
-# Needed for libc
-$script_dir/run_pup.py install ncurses
 
 # Build Pedigree.
 mkdir -p build-host && cd build-host
@@ -97,6 +96,15 @@ echo "Ensuring CDI is up-to-date."
 # Setup all submodules, make sure they are up-to-date
 git submodule init > /dev/null 2>&1
 git submodule update > /dev/null 2>&1
+
+echo
+echo "Configuring the Pedigree UPdater..."
+
+$script_dir/setup_pup.py amd64
+$script_dir/run_pup.sh sync
+
+# Needed for libc
+$script_dir/run_pup.py install ncurses
 
 echo
 echo "Installing a base set of packages..."

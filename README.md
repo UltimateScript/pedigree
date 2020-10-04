@@ -48,6 +48,19 @@ you to jump straight into testing Pedigree.
 To build Pedigree at any point after this, just run `scons`. The build system
 remembers the configuration the Easy Build specified for you.
 
+
+#### A informal message for you from the current maintainer:
+```
+Ok, so the build process might fail for you, because this project might lag behind gcc's progress...
+
+Also, if the process breaks with
+	"undefined reference to `ld_pedigree_x86_64_emulation'"
+then clear the temp dir and start again. It shouldn't happen again...
+	rm -r pedigree-compiler/build_tmp/
+	./easy_build_[target].sh
+Open an issue or send pull request (or whatever suits for you) if you know a fix for this.
+```
+
 ### Different Targets
 
 To switch between architectures, just remove `options.cache` and
