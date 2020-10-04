@@ -74,11 +74,24 @@ cmake -DCMAKE_TOOLCHAIN_FILE=../build-etc/cmake/pedigree_amd64.cmake -DIMPORT_EX
 make libc
 cd ..
 
+
+
+echo
+echo "Configuring the Pedigree UPdater..."
+
+$script_dir/setup_pup.py amd64
+$script_dir/run_pup.sh sync
+
+# Needed for libc
+$script_dir/run_pup.sh install ncurses
+
 # Pull down libtool.
-$script_dir/run_pup.py install libtool
+$script_dir/run_pup.sh install libtool
+
 
 # Enforce using our libtool.
 export LIBTOOL=$script_dir/../images/local/applications:$PATH
+
 
 # Build GCC again with access to the newly built libc.
 # This will create a libstdc++ that can be used by pedigree-apps to build GCC
@@ -98,41 +111,32 @@ git submodule init > /dev/null 2>&1
 git submodule update > /dev/null 2>&1
 
 echo
-echo "Configuring the Pedigree UPdater..."
-
-$script_dir/setup_pup.py amd64
-$script_dir/run_pup.sh sync
-
-# Needed for libc
-$script_dir/run_pup.py install ncurses
-
-echo
 echo "Installing a base set of packages..."
 
-$script_dir/run_pup.py install pedigree-base
-$script_dir/run_pup.py install libpng
-$script_dir/run_pup.py install libfreetype
-$script_dir/run_pup.py install libiconv
-$script_dir/run_pup.py install zlib
+$script_dir/run_pup.sh install pedigree-base
+$script_dir/run_pup.sh install libpng
+$script_dir/run_pup.sh install libfreetype
+$script_dir/run_pup.sh install libiconv
+$script_dir/run_pup.sh install zlib
 
-$script_dir/run_pup.py install bash
-$script_dir/run_pup.py install coreutils
-$script_dir/run_pup.py install fontconfig
-$script_dir/run_pup.py install pixman
-$script_dir/run_pup.py install cairo
-$script_dir/run_pup.py install expat
-$script_dir/run_pup.py install mesa
-$script_dir/run_pup.py install gettext
+$script_dir/run_pup.sh install bash
+$script_dir/run_pup.sh install coreutils
+$script_dir/run_pup.sh install fontconfig
+$script_dir/run_pup.sh install pixman
+$script_dir/run_pup.sh install cairo
+$script_dir/run_pup.sh install expat
+$script_dir/run_pup.sh install mesa
+$script_dir/run_pup.sh install gettext
 
-$script_dir/run_pup.py install pango
-$script_dir/run_pup.py install glib
-$script_dir/run_pup.py install libpcre
-$script_dir/run_pup.py install harfbuzz
-$script_dir/run_pup.py install libffi
-$script_dir/run_pup.py install dialog
+$script_dir/run_pup.sh install pango
+$script_dir/run_pup.sh install glib
+$script_dir/run_pup.sh install libpcre
+$script_dir/run_pup.sh install harfbuzz
+$script_dir/run_pup.sh install libffi
+$script_dir/run_pup.sh install dialog
 
 # Install GCC to pull in shared libstdc++.
-$script_dir/run_pup.py install gcc
+$script_dir/run_pup.sh install gcc
 
 set -e
 
