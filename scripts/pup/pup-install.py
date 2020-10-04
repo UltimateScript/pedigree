@@ -73,7 +73,7 @@ class TarEntry(object):
             return
 
         with open(self.name, 'w') as f:
-            f.write(self.data)
+            f.write(str(self.data))
 
         os.chmod(self.name, self.mode)
 
@@ -119,7 +119,7 @@ def main(arglist):
     s.close()
     
     # Package name
-    packageName = "%s-%s-%s" % (data[1], data[2], desiredArch)
+    packageName = "%s-%s-%s" % (data[3], data[1], data[2])
     localFile = "%s/%s.pup" % (localPath, packageName)
     
     print("Preparing to install %s" % (packageName))
@@ -182,10 +182,14 @@ def main(arglist):
     # Make sure symlinks appear last in the list of files.
     files = [f for f in filelist if not f.linkname]
     links = [f for f in filelist if f.linkname]
-
-    p = multiprocessing.pool.Pool(processes=max(multiprocessing.cpu_count() / 2, 1))
-    p.map(do_extract, files)
-
+    
+    # Pooling gives "cannot pickle '_io.BufferedReader' object" error
+    if False:
+        p = multiprocessing.pool.Pool(processes=max(int(multiprocessing.cpu_count() / 2), 1))
+        p.map(do_extract, files)
+    else:
+        do_extract(files)
+    
     # Do links last and unthreaded, as they depend on extracted files.
     do_extract(links)
     
