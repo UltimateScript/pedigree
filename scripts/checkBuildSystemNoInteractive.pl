@@ -7,9 +7,9 @@ die ("No target given!") unless scalar @ARGV > 0;
 
 my $target = $ARGV[0];
 
-my $gcc_version = "6.3.0";
-my $binutils_version = "2.28";
-my $nasm_version = "2.12.02";
+my $gcc_version = "9.3.0";
+my $binutils_version = "2.35";
+my $nasm_version = "2.15.05";
 
 my $gcc_configure_special = " --disable-werror ";
 my $binutils_configure_special = " --disable-werror ";
@@ -38,22 +38,22 @@ for(my $i = 2; $i < @ARGV; $i++)
     }
 }
 
-my @download = ( {'url' => "ftp://ftp.gnu.org/gnu/gcc/gcc-$gcc_version/gcc-$gcc_version.tar.bz2",
+my @download = ( {'url' => "ftp://ftp.gnu.org/gnu/gcc/gcc-$gcc_version/gcc-$gcc_version.tar.xz",
                   'name' => 'GCC',
-                  'filename' => "gcc-$gcc_version.tar.bz2",
-                  'extract' => "tar -xjf gcc-$gcc_version.tar.bz2",
+                  'filename' => "gcc-$gcc_version.tar.xz",
+                  'extract' => "tar -xJf gcc-$gcc_version.tar.xz",
                   'arch' => 'all',
                   'creates' => "gcc-$gcc_version"},
-                 {'url' => "ftp://ftp.gnu.org/gnu/binutils/binutils-$binutils_version.tar.bz2",
+                 {'url' => "ftp://ftp.gnu.org/gnu/binutils/binutils-$binutils_version.tar.xz",
                   'name' => 'Binutils',
-                  'filename' => "binutils-$binutils_version.tar.bz2",
-                  'extract' => "tar -xjf binutils-$binutils_version.tar.bz2",
+                  'filename' => "binutils-$binutils_version.tar.xz",
+                  'extract' => "tar -xJf binutils-$binutils_version.tar.xz",
                   'arch' => 'all',
                   'creates' => "binutils-$binutils_version"},
-                 {'url' => "http://www.nasm.us/pub/nasm/releasebuilds/$nasm_version/nasm-$nasm_version.tar.bz2",
+                 {'url' => "http://www.nasm.us/pub/nasm/releasebuilds/$nasm_version/nasm-$nasm_version.tar.xz",
                   'name' => 'Nasm',
-                  'filename' => "nasm-$nasm_version.tar.bz2",
-                  'extract' => "tar -xjf nasm-$nasm_version.tar.bz2",
+                  'filename' => "nasm-$nasm_version.tar.xz",
+                  'extract' => "tar -xJf nasm-$nasm_version.tar.xz",
                   'arch' => 'i686-pedigree x86_64-pedigree amd64-pedigree i686-elf amd64-elf',
                   'creates' => "nasm-$nasm_version"} );
 
