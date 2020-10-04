@@ -169,7 +169,7 @@ struct Inode
     uint32_t i_dir_acl;  // Top 32-bits of file size.
     uint32_t i_faddr;
     uint8_t i_osd2[12];
-} __attribute__((packed));
+}; // __attribute__((packed)); // packing leads to unaligned pointer value error
 
 /** An ext2 directory entry. */
 struct Dir
