@@ -18,50 +18,82 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 '''
 
-import os, sys, urllib, sqlite3
+import os, sys, urllib.request, urllib.parse, urllib.error, sqlite3
+import json
 
 import pup_common
 
 def main(arglist):
 
-    remotePath, localPath, ignore, ignore = pup_common.getConfig(arglist)
-    
-    if localPath[-1] == "/":
-        localPath = localPath[0:-1]
+	remotePath, localPath, ignore, ignore = pup_common.getConfig(arglist)
+	
+	if localPath[-1] == "/":
+		localPath = localPath[0:-1]
 
-    if not os.path.exists(localPath):
-        os.makedirs(localPath)
-    
-    localFile = localPath + "/packages_new.pupdb"
+	if not os.path.exists(localPath):
+		os.makedirs(localPath)
+	
+	localFile = localPath + "/packages_new.pupdb"
 
-    # TODO: merge multiple databases (and store the server on which each package can be found?)
-    success = False
-    for server in remotePath:
-        remoteUrl = "%s/packages.pupdb" % (server)
-    
-        print "    -> syncing with %s" % (remoteUrl),
-        try:
-            o = urllib.FancyURLopener()
-            o.retrieve(remoteUrl, localFile)
-            success = True
-            print "(OK)"
-            break
-        except:
-            print "(failed)"
-            continue
-    
-    if not success:
-        print "Error: couldn't download package information from any server."
-        exit(1)
-    
-    # If the database isn't a valid sqlite database, this will fail
-    s = sqlite3.connect(localFile)
-    s.execute("select * from packages")
-    s.close()
-    
-    os.rename(localFile, localPath + "/packages.pupdb")
-    
-    print "Synchronisation complete."
+	# TODO: merge multiple databases (and store the server on which each package can be found?)
+	success = False
+	for server in remotePath:
+		remoteUrl = "%s/packages.pupdb" % (server)
+	
+		print("	-> syncing with %s" % (remoteUrl), end=' ')
+		try:
+			o = urllib.request.FancyURLopener()
+			o.retrieve(remoteUrl, localFile)
+			success = True
+			print("(OK)")
+			break
+		except:
+			print("(failed)")
+			continue
+	
+	if not success:
+		print("Error: couldn't download package information from any server.")
+		exit(1)
+	
+	# If the database isn't a valid sqlite database, this will fail
+	#print("local-file: " + localFile)
+	#print("dest-local-file: " + localPath + "/packages.pupdb")
+	db = sqlite3.connect(localPath + "/packages.pupdb")
+	read_file = open(localFile, "r")
+	dbfile = json.load(read_file)
+	keys = list(dbfile.keys())
+	values = list(dbfile.values())
+	
+	columns = []
+	for i in range(len(keys)):
+		key = keys[i]
+		value = values[i]
+		for col in list(value.keys()):
+			if col not in columns:
+				columns.append(col)
+	
+	
+	print("Columns: " + str(columns))
+	
+	rows = []
+	for i in range(len(keys)):
+		key = keys[i]
+		value = values[i]
+		row = []
+		for col in columns:
+			row.append(str(dict(value).get(col)))   
+		rows.append(list(row))
+	
+	create_query = "create table if not exists packages ({0})".format(" text,".join(columns))
+	insert_query = "insert into packages ({0}) values (?{1})".format(",".join(columns), ",?" * (len(columns)-1))
+	c = db.cursor()   
+	c.execute(create_query)
+	c.executemany(insert_query , rows)
+	values.clear()
+	db.commit()
+	c.close()
+	
+	print("Synchronisation complete.")
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+	main(sys.argv[1:])

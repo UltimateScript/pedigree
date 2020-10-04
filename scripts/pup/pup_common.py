@@ -17,7 +17,7 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 '''
 
-import ConfigParser, os
+import configparser, os
 
 def getConfig(args):
     # Check for a config file
@@ -30,7 +30,7 @@ def getConfig(args):
 
     # Try and read the config file
     if os.path.exists(configFile):
-        cp = ConfigParser.ConfigParser()
+        cp = configparser.ConfigParser()
         cp.read(configFile)
 
         localPath = cp.get("paths", "localdb")
